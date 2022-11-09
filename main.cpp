@@ -1,11 +1,21 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <functional>
+#include <SFML/System.hpp>
 
 #define WIDTH 1280
 #define HEIGHT 720
-#define N 10000
+#define N 50000
 
 #include <Particle.hpp>
+
+void particle_update(Particle* arr, int start, int end) 
+{
+    for(int i = start; i < end; i++)
+    {
+        arr[i].update();
+    }
+}
 
 int main()
 {
@@ -42,8 +52,11 @@ int main()
     Particle* p = new Particle[N];
     for(int i = 0; i < N; i++) 
     {
-        p[i] = Particle(sf::Vector2f(i/10, 0), sf::Color(255, 255, 255, 255), 0.5);
+        p[i] = Particle(sf::Vector2f(i/10, 0), sf::Color(255, 255, 255, 255), 0.25);
     }
+
+    sf::Thread t1(std::bind(&particle_update, p, 0, N/2));
+    sf::Thread t2(std::bind(&particle_update, p, N/2, N));
 
     // run the program as long as the window is open
     while (window.isOpen())
@@ -99,10 +112,18 @@ int main()
         }
 
         //update
-        for(int i = 0; i < N; i++) 
-        {
-            p[i].update();
-        }
+
+        // for(int i = 0; i < N; i++) 
+        // {
+        //     p[i].update();
+        // }
+
+        t1.launch();
+        t2.launch();
+
+        // t1.wait();
+        // t2.wait();
+
         // do shader stuff
         shader.setUniform("texture", sf::Shader::CurrentTexture);
         renderTexture.draw(sf::Sprite(renderTexture.getTexture()), &shader);
@@ -117,6 +138,8 @@ int main()
         window.draw(sf::Sprite(renderTexture.getTexture()));
         window.display();
     }
+
+    delete p;
 
     return 0;
 }
