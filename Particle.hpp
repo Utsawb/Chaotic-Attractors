@@ -1,12 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
-
-#define WIDTH 1280
-#define HEIGHT 720
+#include <cstdlib>
 
 class Particle {
     public:
-        float scale;
         Particle() { }
 
         Particle(sf::Vector2f p, sf::Color c, float r) 
@@ -24,17 +21,28 @@ class Particle {
             selector = n;
         }
 
+        void change_offset(float s)
+        {
+            offset += s;
+        }
+
         void change_scale(float s) 
         {
             scale += s;
+        }
+
+        void randomize()
+        {
+            position.x = rand() % WIDTH;
+            position.y = rand() % HEIGHT;
         }
 
         void update() 
         {
             float x = position.x;
             float y = position.y;
-            position.x = sinf(a[selector] * y) + c[selector] * cosf(a[selector] * x);
-            position.y = sinf(b[selector] * x) + d[selector] * cosf(b[selector] * y);
+            position.x = sinf(a[selector] * y) + (c[selector] + offset) * cosf(a[selector] * x);
+            position.y = sinf(b[selector] * x) + (d[selector] + offset) * cosf(b[selector] * y);
         }
 
         void draw(sf::RenderTexture &texture) 
@@ -49,6 +57,8 @@ class Particle {
         sf::CircleShape shape;
         int selector;
         int constraints;
+        float scale;
+        float offset;
         float a[5] = {-1.7, -1.7, 1.5, -2.239, -1.7};
         float b[5] = {1.3, 1.8, -1.8, -2.956, 1.8};
         float c[5] = {-0.1, -0.9, 1.6, 1.272, -1.9};

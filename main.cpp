@@ -14,7 +14,7 @@ int main()
     "void main()" \
     "{" \
     "   vec4 pixel = texture2D(texture, gl_TexCoord[0].xy);" \
-    "   gl_FragColor = gl_Color * pixel * vec4(0.98, 0.98, 0.98, 1);" \
+    "   gl_FragColor = gl_Color * pixel * vec4(0.95, 0.95, 0.95, 1);" \
     "}";
     // loading the shader
     sf::Shader shader;
@@ -60,7 +60,6 @@ int main()
                 {
                     p[i].change_selector(event.key.code - 27);
                 }
-            renderTexture.clear(sf::Color::Black);
             }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -69,7 +68,6 @@ int main()
             {
                 p[i].change_scale(0.5);
             }
-            renderTexture.clear(sf::Color::Black);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
@@ -77,7 +75,27 @@ int main()
             {
                 p[i].change_scale(-0.5);
             }
-            renderTexture.clear(sf::Color::Black);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            for(int i = 0; i < N; i++) 
+            {
+                p[i].change_offset(0.05);
+            }
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            for(int i = 0; i < N; i++) 
+            {
+                p[i].change_offset(-0.05);
+            }
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        {
+            for(int i = 0; i < N; i++) 
+            {
+                p[i].randomize();
+            }
         }
 
         //update
