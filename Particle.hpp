@@ -11,7 +11,7 @@ class Particle {
 
         Particle(sf::Vector2f p, sf::Color c, float r) 
         {
-            scale = WIDTH / HEIGHT * 75.0;
+            scale = WIDTH / HEIGHT * 120.0;
             position = p;
             shape.setRadius(r);
             shape.setFillColor(c);
@@ -37,12 +37,12 @@ class Particle {
             position.y = sinf(b[selector] * x) + d[selector] * cosf(b[selector] * y);
         }
 
-        void draw(sf::RenderWindow &window) 
+        void draw(sf::RenderTexture &texture) 
         {
-            float x = position.x * scale;
-            float y = position.y * scale;
+            float x = position.x * scale + WIDTH/2;
+            float y = position.y * scale + HEIGHT/2;
             shape.setPosition(x, y);
-            window.draw(shape);
+            texture.draw(shape);
         }
     private:
         sf::Vector2f position;

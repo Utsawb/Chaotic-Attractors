@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 #define WIDTH 1280
 #define HEIGHT 720
@@ -8,18 +9,40 @@
 
 int main()
 {
+    const std::string fragmentShader = \
+    "uniform sampler2D texture;" \
+    "void main()" \
+    "{" \
+    "   vec4 pixel = texture2D(texture, gl_TexCoord[0].xy);" \
+    "   gl_FragColor = gl_Color * pixel * vec4(0.98, 0.98, 0.98, 1);" \
+    "}";
+    // loading the shader
+    sf::Shader shader;
+    if (!shader.loadFromMemory(fragmentShader, sf::Shader::Fragment))
+    {
+        std::cout << "Shader didnt load idiot!";
+        return -1;
+    }
+
     // create the window
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Particle go weee");
-    sf::View view;
-    view.setCenter(0, 0);
-    window.setView(view);
-    window.setKeyRepeatEnabled(false);
+
+    // window stuff
     window.setFramerateLimit(60);
+
+    // render texture stuff
+    sf::RenderTexture renderTexture;
+    renderTexture.create(WIDTH, HEIGHT);
+    renderTexture.clear(sf::Color::Black);
+
+    // housekeeping for input
+    window.setKeyRepeatEnabled(false);
+
     // creating the particles
     Particle* p = new Particle[N];
     for(int i = 0; i < N; i++) 
     {
-        p[i] = Particle(sf::Vector2f(i/10, 0), sf::Color(255, 255, 255, 255), 1.0);
+        p[i] = Particle(sf::Vector2f(i/10, 0), sf::Color(255, 255, 255, 255), 0.5);
     }
 
     // run the program as long as the window is open
@@ -37,7 +60,7 @@ int main()
                 {
                     p[i].change_selector(event.key.code - 27);
                 }
-            window.clear(sf::Color::Black);
+            renderTexture.clear(sf::Color::Black);
             }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -46,7 +69,7 @@ int main()
             {
                 p[i].change_scale(0.5);
             }
-            window.clear(sf::Color::Black);
+            renderTexture.clear(sf::Color::Black);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
@@ -54,7 +77,7 @@ int main()
             {
                 p[i].change_scale(-0.5);
             }
-            window.clear(sf::Color::Black);
+            renderTexture.clear(sf::Color::Black);
         }
 
         //update
@@ -62,14 +85,18 @@ int main()
         {
             p[i].update();
         }
-
-        // draw
+        // do shader stuff
+        shader.setUniform("texture", sf::Shader::CurrentTexture);
+        renderTexture.draw(sf::Sprite(renderTexture.getTexture()), &shader);
+        // draw to texture
         for(int i = 0; i < N; i++) 
         {
-            p[i].draw(window);
+            p[i].draw(renderTexture);
         }
-
+        
         // end the current frame
+        renderTexture.display();
+        window.draw(sf::Sprite(renderTexture.getTexture()));
         window.display();
     }
 
