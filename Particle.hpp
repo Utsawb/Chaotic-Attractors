@@ -4,18 +4,13 @@
 
 class Particle {
     public:
-        sf::Color color;
+        sf::Vector2f position;
         Particle() { }
 
-        Particle(sf::Vector2f p, sf::Color c) 
+        Particle(sf::Vector2f p) 
         {
-            scale = WIDTH / HEIGHT * 120.0;
             position = p;
-            shape.setSize(sf::Vector2f(0.5, 0.5));
-            shape.setFillColor(c);
             selector = 0;
-            constraints = 4;
-            color = c;
         }
 
         void change_selector(int n)
@@ -26,11 +21,6 @@ class Particle {
         void change_offset(float s)
         {
             offset += s;
-        }
-
-        void change_scale(float s) 
-        {
-            scale += s;
         }
 
         void randomize()
@@ -46,28 +36,11 @@ class Particle {
             position.x = (sinf(a[selector] * y) + (c[selector] + offset) * cosf(a[selector] * x));
             position.y = (sinf(b[selector] * x) + (d[selector] + offset) * cosf(b[selector] * y));
         }
-
-        void draw(sf::RenderTexture &texture) 
-        {
-            float x = position.x * scale + WIDTH/2;
-            float y = position.y * scale + HEIGHT/2;
-            shape.setPosition(x, y);
-            texture.draw(shape);
-        }
-
-        sf::Vector2f draw_for_vertex_array()
-        {
-            return sf::Vector2f(position.x * scale + WIDTH/2, position.y * scale + HEIGHT/2);
-        }
     private:
-        sf::Vector2f position;
-        sf::RectangleShape shape;
         int selector;
-        int constraints;
-        float scale;
         float offset;
-        float a[5] = {-1.7, -1.7, 1.5, -2.239, -1.7};
-        float b[5] = {1.3, 1.8, -1.8, -2.956, 1.8};
-        float c[5] = {-0.1, -0.9, 1.6, 1.272, -1.9};
-        float d[5] = {-1.21, -0.4, 2.0, 1.419, -0.4};
+        float a[6] = {-1.7, -1.7, 1.5, -2.239, -1.7, 0};
+        float b[6] = {1.3, 1.8, -1.8, -2.956, 1.8, 0};
+        float c[6] = {-0.1, -0.9, 1.6, 1.272, -1.9, 0};
+        float d[6] = {-1.21, -0.4, 2.0, 1.419, -0.4, 0};
 };
