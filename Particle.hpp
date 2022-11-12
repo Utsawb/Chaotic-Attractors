@@ -6,11 +6,11 @@ class Particle {
     public:
         Particle() { }
 
-        Particle(sf::Vector2f p, sf::Color c, float r) 
+        Particle(sf::Vector2f p, sf::Color c) 
         {
             scale = WIDTH / HEIGHT * 120.0;
             position = p;
-            shape.setRadius(r);
+            shape.setSize(sf::Vector2f(0.5, 0.5));
             shape.setFillColor(c);
             selector = 0;
             constraints = 4;
@@ -41,8 +41,8 @@ class Particle {
         {
             float x = position.x;
             float y = position.y;
-            position.x = sinf(a[selector] * y) + (c[selector] + offset) * cosf(a[selector] * x);
-            position.y = sinf(b[selector] * x) + (d[selector] + offset) * cosf(b[selector] * y);
+            position.x = sinf(a[selector] * y + offset) + (c[selector]) * cosf(a[selector] * x);
+            position.y = sinf(b[selector] * x + offset) + (d[selector]) * cosf(b[selector] * y);
         }
 
         void draw(sf::RenderTexture &texture) 
@@ -54,7 +54,7 @@ class Particle {
         }
     private:
         sf::Vector2f position;
-        sf::CircleShape shape;
+        sf::RectangleShape shape;
         int selector;
         int constraints;
         float scale;

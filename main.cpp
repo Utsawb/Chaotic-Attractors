@@ -3,17 +3,20 @@
 #include <functional>
 #include <SFML/System.hpp>
 
-#define WIDTH 1280
-#define HEIGHT 720
-#define N 50000
+#define WIDTH 1920
+#define HEIGHT 1080
+#define N 100000
 
 #include <Particle.hpp>
 
 void particle_update(Particle* arr, int start, int end) 
 {
-    for(int i = start; i < end; i++)
+    while(!(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)))
     {
-        arr[i].update();
+        for(int i = start; i < end; i++)
+        {
+            arr[i].update();
+        }
     }
 }
 
@@ -24,7 +27,7 @@ int main()
     "void main()" \
     "{" \
     "   vec4 pixel = texture2D(texture, gl_TexCoord[0].xy);" \
-    "   gl_FragColor = gl_Color * pixel * vec4(0.95, 0.95, 0.95, 1);" \
+    "   gl_FragColor = gl_Color * pixel * vec4(5, 5, 5, 1);" \
     "}";
     // loading the shader
     sf::Shader shader;
@@ -35,7 +38,7 @@ int main()
     }
 
     // create the window
-    sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Particle go weee");
+    sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Particle go weee", sf::Style::Fullscreen);
 
     // window stuff
     window.setFramerateLimit(60);
@@ -43,7 +46,7 @@ int main()
     // render texture stuff
     sf::RenderTexture renderTexture;
     renderTexture.create(WIDTH, HEIGHT);
-    renderTexture.clear(sf::Color::Black);
+    renderTexture.clear(sf::Color::White);
 
     // housekeeping for input
     window.setKeyRepeatEnabled(false);
@@ -52,11 +55,13 @@ int main()
     Particle* p = new Particle[N];
     for(int i = 0; i < N; i++) 
     {
-        p[i] = Particle(sf::Vector2f(i/10, 0), sf::Color(255, 255, 255, 255), 0.25);
+        p[i] = Particle(sf::Vector2f(i/10, 0), sf::Color(1, 1, 1, 255));
     }
 
     sf::Thread t1(std::bind(&particle_update, p, 0, N/2));
     sf::Thread t2(std::bind(&particle_update, p, N/2, N));
+    t1.launch();
+    t2.launch();
 
     // run the program as long as the window is open
     while (window.isOpen())
@@ -66,7 +71,7 @@ int main()
         while (window.pollEvent(event))
         {
             // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) window.close();
             if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Num3 || event.key.code == sf::Keyboard::Num4 || event.key.code == sf::Keyboard::Num5)
             {
                 for(int i = 0; i < N; i++) 
@@ -111,19 +116,6 @@ int main()
             }
         }
 
-        //update
-
-        // for(int i = 0; i < N; i++) 
-        // {
-        //     p[i].update();
-        // }
-
-        t1.launch();
-        t2.launch();
-
-        // t1.wait();
-        // t2.wait();
-
         // do shader stuff
         shader.setUniform("texture", sf::Shader::CurrentTexture);
         renderTexture.draw(sf::Sprite(renderTexture.getTexture()), &shader);
@@ -138,7 +130,8 @@ int main()
         window.draw(sf::Sprite(renderTexture.getTexture()));
         window.display();
     }
-
+    t1.wait();
+    t2.wait();
     delete p;
 
     return 0;
