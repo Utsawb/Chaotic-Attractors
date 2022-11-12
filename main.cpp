@@ -5,7 +5,7 @@
 
 #define WIDTH 1920
 #define HEIGHT 1080
-#define N 100000
+#define N 1000000
 
 #include <Particle.hpp>
 
@@ -120,10 +120,14 @@ int main()
         shader.setUniform("texture", sf::Shader::CurrentTexture);
         renderTexture.draw(sf::Sprite(renderTexture.getTexture()), &shader);
         // draw to texture
+        sf::VertexArray objs(sf::Points, N);
         for(int i = 0; i < N; i++) 
         {
-            p[i].draw(renderTexture);
+            // p[i].draw(renderTexture);
+            objs[i].position = p[i].draw_for_vertex_array();
+            objs[i].color = p[i].color;
         }
+        renderTexture.draw(objs);
         
         // end the current frame
         renderTexture.display();

@@ -4,6 +4,7 @@
 
 class Particle {
     public:
+        sf::Color color;
         Particle() { }
 
         Particle(sf::Vector2f p, sf::Color c) 
@@ -14,6 +15,7 @@ class Particle {
             shape.setFillColor(c);
             selector = 0;
             constraints = 4;
+            color = c;
         }
 
         void change_selector(int n)
@@ -41,8 +43,8 @@ class Particle {
         {
             float x = position.x;
             float y = position.y;
-            position.x = sinf(a[selector] * y + offset) + (c[selector]) * cosf(a[selector] * x);
-            position.y = sinf(b[selector] * x + offset) + (d[selector]) * cosf(b[selector] * y);
+            position.x = (sinf(a[selector] * y) + (c[selector] + offset) * cosf(a[selector] * x));
+            position.y = (sinf(b[selector] * x) + (d[selector] + offset) * cosf(b[selector] * y));
         }
 
         void draw(sf::RenderTexture &texture) 
@@ -51,6 +53,11 @@ class Particle {
             float y = position.y * scale + HEIGHT/2;
             shape.setPosition(x, y);
             texture.draw(shape);
+        }
+
+        sf::Vector2f draw_for_vertex_array()
+        {
+            return sf::Vector2f(position.x * scale + WIDTH/2, position.y * scale + HEIGHT/2);
         }
     private:
         sf::Vector2f position;
