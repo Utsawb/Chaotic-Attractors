@@ -2,12 +2,15 @@
 #include <iostream>
 #include <functional>
 #include <SFML/System.hpp>
+#ifdef linux
+    #include <X11/Xlib.h>
+#endif
 
 #define WIDTH 1920
 #define HEIGHT 1080
 #define N 1000000
 
-#include <Particle.hpp>
+#include "Particle.hpp"
 
 void particle_update(Particle* arr, int start, int end) 
 {
@@ -30,6 +33,10 @@ void update_vertex_array(Particle* arr, int start, int end, sf::VertexArray &ver
 
 int main()
 {
+    #ifdef linux
+        XInitThreads();
+    #endif
+
     // create the window
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Particle go weee", sf::Style::Fullscreen);
 
@@ -44,7 +51,7 @@ int main()
     Particle* p = new Particle[N];
     for(int i = 0; i < N; i++) 
     {
-        p[i] = Particle(sf::Vector2f(i/10, 0));
+        p[i] = Particle(sf::Vector2f(i/10.0, 0));
     }
 
     sf::Thread t1(std::bind(&particle_update, p, 0, N/4));
@@ -119,7 +126,7 @@ int main()
     t2.wait();
     t3.wait();
     t4.wait();
-    delete p;
+    delete[] p;
 
     return 0;
 }
